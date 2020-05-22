@@ -21,6 +21,11 @@ def load_stop_words(file):
 
 
 def load_data(basePath):
+    """
+    基本路径下所有数据的加载
+    :param basePath: 数据基本路径
+    :return: 分词后的文档列表和标签列表
+    """
     word_label = []
     word_list = []
     for root, dirs, files in os.walk(basePath):
@@ -34,15 +39,25 @@ def load_data(basePath):
 
 
 def trainModel(trainData, trainLabel, testData, testLabel, stop_words):
+    """
+    多项式贝叶斯分类器 模型训练及预测
+    :param trainData: 训练集数据
+    :param trainLabel: 训练集标签
+    :param testData: 测试集数据
+    :param testLabel: 测试集标签
+    :param stop_words: 停用词列表
+    :return: 模型的准确率
+    """
     tf = TfidfVectorizer(stop_words=stop_words, max_df=0.5)
+    # fit_transform 拟合模型，返回文本矩阵
     train_feature = tf.fit_transform(trainData)
+    # 用trainData fit 过了，测试数据只需要进行transform
     test_feature = tf.transform(testData)
 
     clf = MultinomialNB(alpha=0.001).fit(train_feature, trainLabel)
     predicted_label = clf.predict(test_feature)
 
     x = metrics.accuracy_score(testLabel, predicted_label)
-
     return x
 
 
